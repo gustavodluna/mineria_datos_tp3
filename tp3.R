@@ -76,4 +76,82 @@ soporte
 
 confianza <- 0.7
 
+# Busqueda de itemsets frecuentes
 
+itemsets_frecuentes <- apriori(
+                              data = transacciones,
+                              parameter = list(support=soporte,
+                                               target="frequent itemsets"
+                                               ),
+                              control=list(verbose=FALSE)
+                              )
+summary(itemsets_frecuentes)
+
+# Top itemsets mas frecuentes
+
+top6_itemsets <- sort(itemsets_frecuentes,by="support",decreasing = TRUE)[1:6]
+
+inspect(top6_itemsets)
+
+library(dplyr)
+
+as(top6_itemsets,Class = "data.frame") %>%
+  ggplot(aes(x=reorder(items,support),y=support)) +
+  geom_col(fill="skyblue3",width = 0.5) +
+  coord_flip() +
+  labs(y="soporte",x="itemsets") +
+  theme_bw()
+
+# Itemsets frecuentes que contienen "Banana"
+
+itemsets_banana <- arules::subset(itemsets_frecuentes,
+                                  subset=items %ain% "Banana"
+                                  )
+inspect(itemsets_banana[1:5])
+
+# Obtención de reglas de asociación 
+
+reglas <- apriori(
+                  data=transacciones,
+                  parameter = list(support=soporte,
+                                   confidence=confianza,
+                                   target="rules"
+                                   ),
+                  control=list(verbose=FALSE)
+                  )
+print(paste("Reglas generadas: ", length(reglas)))
+
+summary(reglas)
+
+# Reglas obtenidas ordenadas por orden descendente de confianza
+
+inspect(sort(reglas,decreasing = TRUE,by="confidence"))
+
+
+reglas_filtradas<- subset(
+                          reglas,
+                          subset=lhs %ain% "Blueberry Whole Milk Yogurt Pouch" &
+                            confidence>0.9
+                          )
+inspect(reglas_filtradas)
+
+reglas_maximales<-reglas[is.maximal(reglas)]
+reglas_maximales
+
+inspect(reglas_maximales)
+
+# Reglas con items relacionados con Sparkling Water Grapefruit
+
+reglas_waterGrape<- apriori(
+                            transacciones,
+                            parameter = list(support=soporte,
+                                             confidence=confianza,
+                                             target="rules"
+                                             ),
+                            appearance = list(
+                                              rhs="Sparkling Water Grapefruit",
+                                              default="lhs"
+                                              ),
+                            control = list(verbose=FALSE)
+                            )
+inspect(reglas_waterGrape)
