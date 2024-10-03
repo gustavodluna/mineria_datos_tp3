@@ -53,3 +53,27 @@ ggplot(tamanhos_trans,aes(x=tamanho)) +
   geom_density(fill="orangered3") +
   labs(x="Tamaño de las transacciones") +
   theme_bw()
+
+# Distribución del tamanho de las transacciones por cuantiles
+
+summary(tamanhos_trans)
+
+# Frecuencia de cada item
+
+head(itemFrequency(transacciones))
+
+# Mantenemos las transacciones con al menos dos items
+
+transacciones <- transacciones[tamanhos_trans>1]
+dim(transacciones)
+
+# Umbral de soporte
+
+soporte<- 15/dim(transacciones)[1]
+soporte
+
+# Umbral de confianza
+
+confianza <- 0.7
+
+
