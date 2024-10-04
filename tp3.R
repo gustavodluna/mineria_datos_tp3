@@ -155,3 +155,40 @@ reglas_waterGrape<- apriori(
                             control = list(verbose=FALSE)
                             )
 inspect(reglas_waterGrape)
+
+
+testFisher<- interestMeasure (
+                              reglas,
+                              measure = "fishersExactTest",
+                              transactions = transacciones
+                              )
+summary(testFisher)
+
+# Añadimos los indices al conjunto de reglas
+
+quality(reglas)<- cbind(quality(reglas),testFisher)
+
+library(arulesViz)
+
+# Grafico de dispersión coloreado en función del lift
+
+plot(
+  reglas,
+  measure=c("support","confidence"),
+  shading="lift"
+  )
+
+# Grafico de disperión coloreado en función del número de items
+
+plot(
+  reglas,
+  measure=c("support","confidence"),
+  shading="order"
+)
+
+# Gráfico de coordenadas paralelas
+
+plot(
+    reglas,
+    method = "paracoord"
+    )
